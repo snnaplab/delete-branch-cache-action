@@ -54,4 +54,4 @@ runs:
             -H "Authorization: token $GITHUB_TOKEN" \
             "https://api.github.com/repos/$REPOSITORY/actions/caches/$id"
           echo "Delete id:$id"
-       done
+        done
