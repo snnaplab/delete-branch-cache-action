@@ -1,0 +1,57 @@
+name: 'Delete Branch Cache Action'
+description: 'GitHub Actions to delete branch caches.'
+author: 'Hiroyuki Kusu'
+branding:
+  icon: 'trash-2'
+  color: 'yellow'
+inputs:
+  repository:
+    description: ''
+    required: false
+    default: ${{ github.repository }}
+  ref:
+    description: ''
+    required: false
+    default: ${{ github.ref }}
+  key:
+    description: ''
+    required: false
+    default: ''
+  github-token:
+    description: ''
+    required: true
+    default: ${{ github.token }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Delete branch caches
+      shell: bash
+      env:
+        REPOSITORY: ${{ inputs.repository }}
+        REF: ${{ inputs.ref }}
+        KEY: ${{ inputs.key }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        set -eu
+        
+        res=$(curl -f \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                "https://api.github.com/repos/$REPOSITORY/actions/caches")
+
+        ids=$(echo $res | tr -d '[:cntrl:]' | jq -r --arg ref "$REF" --arg key "$KEY" '.actions_caches[] | select(.ref == $ref) | select(.key | startswith($key)) | .id')
+
+        if [ -z "$ids" ]; then
+          echo "Delete target does not exist."
+          exit 0
+        fi
+
+        for id in $ids
+        do
+          curl -f \
+            -X DELETE \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$REPOSITORY/actions/caches/$id"
+          echo "Delete id:$id"
+       done

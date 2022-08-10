@@ -1,0 +1,18 @@
+name: Main Version Branch
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  main-version-branch:
+    name: Create main version branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+      - name: Push HEAD to main version branch
+        run: |
+          if [[ '${{ github.event.release.tag_name }}' =~ ^(v[0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            git push --force origin "HEAD:refs/heads/${BASH_REMATCH[1]}"
+          fi
