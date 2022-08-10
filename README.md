@@ -15,7 +15,7 @@ Besides if you want to clear the caches for some reason, you can save cache spac
 | `key` | Delete caches with keys that prefix match the key specified here. If not specified, all caches of the branch specified by `ref` will be deleted. ||
 | `github-token` | Specify a personal access token (PAT) when targeting a repository different from the workflow. | `${{ github.token }}` |
 
-## Usage
+## Example
 
 ### Remove unused caches when closing a pull request
 
