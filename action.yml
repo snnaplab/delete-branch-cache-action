@@ -19,7 +19,7 @@ inputs:
     default: ''
   github-token:
     description: ''
-    required: true
+    required: false
     default: ${{ github.token }}
 runs:
   using: 'composite'
