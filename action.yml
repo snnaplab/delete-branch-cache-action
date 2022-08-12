@@ -34,24 +34,35 @@ runs:
       run: |
         set -eu
         
-        res=$(curl -f \
-                -H "Accept: application/vnd.github+json" \
-                -H "Authorization: token $GITHUB_TOKEN" \
-                "https://api.github.com/repos/$REPOSITORY/actions/caches")
+        page=1
+        per_page=100
+        del_count=0
 
-        ids=$(echo $res | tr -d '[:cntrl:]' | jq -r --arg ref "$REF" --arg key "$KEY" '.actions_caches[] | select(.ref == $ref) | select(.key | startswith($key)) | .id')
-
-        if [ -z "$ids" ]; then
-          echo "Delete target does not exist."
-          exit 0
-        fi
-
-        for id in $ids
+        while true
         do
-          curl -f \
-            -X DELETE \
+          # Do not use query strings as it is necessary to URL encode if the key contains spaces
+          res=$(curl -f \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/$REPOSITORY/actions/caches/$id"
-          echo "Delete id:$id"
+            "https://api.github.com/repos/$REPOSITORY/actions/caches?per_page=$per_page\&page=$page")
+
+          res_count=$(echo $res | tr -d '[:cntrl:]' | jq '.actions_caches | length')
+          if [ $res_count -eq 0 ]; then break; fi
+
+          targets=$(echo $res | tr -d '[:cntrl:]' | jq --arg ref "$REF" --arg key "$KEY" '.actions_caches[] | select(.ref == $ref) | select(.key | startswith($key))')
+          echo "$targets"
+
+          for id in $(echo $targets | jq '.id')
+          do
+            curl -f \
+             -X DELETE \
+             -H "Accept: application/vnd.github+json" \
+             -H "Authorization: token $GITHUB_TOKEN" \
+             "https://api.github.com/repos/$REPOSITORY/actions/caches/$id"
+            ((del_count+=1))
+          done
+
+          ((page+=1))
         done
+  
+        echo "Delete $del_count caches."
