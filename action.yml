@@ -44,7 +44,7 @@ runs:
           res=$(curl -f \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/$REPOSITORY/actions/caches?per_page=$per_page\&page=$page")
+            "https://api.github.com/repos/$REPOSITORY/actions/caches?per_page=$per_page&page=$page")
 
           res_count=$(echo $res | tr -d '[:cntrl:]' | jq '.actions_caches | length')
           if [ $res_count -eq 0 ]; then break; fi
