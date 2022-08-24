@@ -8,12 +8,12 @@ Besides if you want to clear the caches for some reason, you can save cache spac
 
 ## Inputs
 
-| Name | Description | Default |
-| --- | --- | --- |
-| `repository` | Target repository name with owner, eg `snnaplab/delete-branch-cache-action`. Specify when deleting the cache of a repository different from the workflow. | `${{ github.repository }}` |
-| `ref` | Git reference of target branch in `refs/heads/<branch name>` format. To reference a pull request use `refs/pull/<number>/merge` format. | `${{ github.ref }}` |
-| `key` | Delete caches with keys that prefix match the key specified here. If not specified, all caches of the branch specified by `ref` will be deleted. ||
-| `github-token` | Specify a personal access token (PAT) when targeting a repository different from the workflow. | `${{ github.token }}` |
+| Name | Description | Default | Required |
+| --- | --- | --- | --- |
+| `repository` | Target repository name with owner, eg `snnaplab/delete-branch-cache-action`. Specify when deleting the cache of a repository different from the workflow. | `${{ github.repository }}` | false |
+| `ref` | Git reference of target branch in `refs/heads/<branch name>` format. To reference a pull request use `refs/pull/<number>/merge` format. | `${{ github.ref }}` | false |
+| `key` | Delete caches with keys that prefix match the key specified here. If not specified, all caches of the branch specified by `ref` will be deleted. || false |
+| `github-token` | Specify a personal access token (PAT) when targeting a repository different from the workflow. | `${{ github.token }}` | false |
 
 ## Example
 
